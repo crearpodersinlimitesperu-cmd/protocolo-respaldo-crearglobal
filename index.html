@@ -131,7 +131,12 @@
     .modal-title { font-family: 'Outfit', sans-serif; font-size: 1.6rem; font-weight: 800; margin-bottom: 12px; color: var(--gold); }
     .modal-desc { color: var(--gray-200); font-size: 0.95rem; line-height: 1.7; margin-bottom: 28px; }
     .modal-close { background: linear-gradient(135deg, var(--blue), var(--blue-bright)); color: white; border: none; padding: 12px 32px; border-radius: 30px; font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 6px 20px rgba(41,121,255,0.4); }
-    .modal-close:hover { transform: translateY(-2px); }
+    .form-group { text-align: left; margin-bottom: 16px; }
+    .form-label { display: block; font-size: 0.85rem; color: var(--gray-200); margin-bottom: 8px; font-weight: 600; }
+    .form-input, .form-select { width: 100%; padding: 12px 16px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: white; font-family: 'Inter', sans-serif; font-size: 0.95rem; outline: none; transition: border-color 0.3s; }
+    .form-input:focus, .form-select:focus { border-color: var(--gold); }
+    .form-select option { background: var(--navy-mid); color: white; }
+    
     footer { position: relative; z-index: 1; text-align: center; padding: 30px 40px; border-top: 1px solid rgba(255,255,255,0.07); color: var(--gray-600); font-size: 0.8rem; }
     footer span { color: var(--gold); font-weight: 600; }
     @media (max-width: 680px) { nav { padding: 12px 20px; } .nav-links { display: none; } .hero { padding: 100px 20px 60px; } .section { padding: 60px 20px; } .timeline::before { left: 36px; } .step-node { width: 76px; } .node-circle { width: 44px; height: 44px; font-size: 0.95rem; } }
@@ -319,7 +324,7 @@
   <div class="completion-badge">🛡️</div>
   <h2 class="closing-title">Información <span class="g">Protegida</span>.<br />Operación Completada.</h2>
   <p class="closing-sub">Una vez que ambos archivos hayan sido guardados exitosamente, notifique de inmediato a la gerencia de su sede para registrar el cumplimiento del plan de transición regional.</p>
-  <button class="confirm-btn" id="confirm-btn" onclick="confirmCompletion()"><span>📤</span>Notificar a Gerencia</button>
+  <button class="confirm-btn" id="confirm-btn" onclick="openIdentifyModal()"><span>📝</span>Identificarse y Notificar</button>
   <div style="margin-top:60px;padding-top:40px;border-top:1px solid rgba(255,255,255,0.08);">
     <p style="color:var(--gray-400);font-size:0.85rem;line-height:1.7;max-width:560px;margin:0 auto;">"Gracias por contribuir a la seguridad y continuidad de la información institucional de Crear Global."</p>
     <div style="margin-top:24px;display:flex;align-items:center;justify-content:center;gap:14px;">
@@ -331,12 +336,41 @@
 
 <footer>© 2025 <span>Crear Global</span> · Protocolo de Respaldo Absoluto de Información · Documento de uso interno</footer>
 
+<div class="modal-overlay" id="identify-modal">
+  <div class="modal-box">
+    <div class="modal-title">Identificación de Colaborador</div>
+    <div class="modal-desc">Por favor, ingresa tus datos para notificar a la gerencia de tu sede correspondiente.</div>
+    
+    <div class="form-group">
+      <label class="form-label">Nombre y Apellido</label>
+      <input type="text" id="colab-name" class="form-input" placeholder="Ej. Juan Pérez" />
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">Sede / Gerencia</label>
+      <select id="colab-sede" class="form-select">
+        <option value="" disabled selected>Selecciona tu sede...</option>
+        <option value="emily.campuzano@crearpsl.com" data-gerente="Mila Campuzano">Quito (Ciclo Uno)</option>
+        <option value="freddy.sosa@crearpsl.com" data-gerente="David Sosa">Quito (Ciclo Dos)</option>
+        <option value="josue.vera@crearpsl.com" data-gerente="Josué Vera">Guayaquil</option>
+        <option value="jose.sanchez@crearpsl.com" data-gerente="José Sánchez">Lima</option>
+        <option value="emely.leon@crearpsl.com" data-gerente="July León">Cuenca</option>
+        <option value="yurany.gonzalez@crearpsl.com" data-gerente="Yurany González">Medellín</option>
+        <option value="oficina.mx@crearpsl.com" data-gerente="Paola Solares">Ciudad de México (CDMX)</option>
+      </select>
+    </div>
+
+    <button class="confirm-btn" style="width:100%; justify-content:center; margin-top:16px;" onclick="generateEmail()">Generar Correo</button>
+    <button class="modal-close" style="width:100%; margin-top:12px; background:transparent; box-shadow:none; border:1px solid rgba(255,255,255,0.2);" onclick="closeIdentifyModal()">Cancelar</button>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal">
   <div class="modal-box">
     <div class="modal-icon">✅</div>
-    <div class="modal-title">¡Notificación Enviada!</div>
-    <div class="modal-desc">Has completado el Protocolo de Respaldo Absoluto de Información de Crear Global.<br /><br />Tu gerencia ha sido notificada del cumplimiento del plan de transición regional.</div>
-    <button class="modal-close" onclick="closeModal()">Aceptar</button>
+    <div class="modal-title">¡Casi listo!</div>
+    <div class="modal-desc">Se ha abierto tu aplicación de correo predeterminada.<br /><br />Solo dale <strong>Enviar</strong> al correo generado para que tu gerente reciba la confirmación del cumplimiento del plan.</div>
+    <button class="modal-close" onclick="closeModal()">Entendido</button>
   </div>
 </div>
 
@@ -412,12 +446,58 @@ function toggleRule(card) {
   }
 }
 
-function confirmCompletion() {
+function openIdentifyModal() {
+  document.getElementById('identify-modal').classList.add('active');
+}
+
+function closeIdentifyModal() {
+  document.getElementById('identify-modal').classList.remove('active');
+}
+
+function generateEmail() {
+  const name = document.getElementById('colab-name').value.trim();
+  const sedeSelect = document.getElementById('colab-sede');
+  const email = sedeSelect.value;
+  
+  if (!name || !email) {
+    alert("Por favor, ingresa tu nombre y selecciona tu sede.");
+    return;
+  }
+  
+  const gerenteName = sedeSelect.options[sedeSelect.selectedIndex].getAttribute('data-gerente');
+  const sedeName = sedeSelect.options[sedeSelect.selectedIndex].text;
+  
+  const subject = encodeURIComponent(`Cumplimiento de Respaldo Absoluto - ${name} (${sedeName})`);
+  const body = encodeURIComponent(`Estimado/a ${gerenteName},
+
+Por medio de la presente, confirmo que he completado exitosamente la descarga y respaldo local de mi información (Outlook y OneDrive) siguiendo el Protocolo de Respaldo Absoluto de Información de Crear Global.
+
+Mis archivos han sido verificados y se encuentran seguros en mi equipo.
+
+Atentamente,
+${name}
+Sede: ${sedeName}`);
+
+  // Construct mailto link (we include CEO and CCO in CC for global visibility as requested by directiva info)
+  const cc = "fer.aragon@crearpsl.com,paul.sosa@crearpsl.com";
+  const mailtoLink = `mailto:${email}?cc=${cc}&subject=${subject}&body=${body}`;
+  
+  // Open email client
+  window.location.href = mailtoLink;
+  
+  // Update UI
+  closeIdentifyModal();
+  
   const btn = document.getElementById('confirm-btn');
   btn.classList.add('done');
-  btn.innerHTML = '<span>✅</span> Notificación Enviada';
+  btn.innerHTML = '<span>✅</span> Correo Generado';
   btn.disabled = true;
+  
   setTimeout(() => document.getElementById('modal').classList.add('active'), 400);
+}
+
+function confirmCompletion() {
+  // Obsolete but kept to avoid errors
 }
 
 function closeModal() {
@@ -426,6 +506,9 @@ function closeModal() {
 
 document.getElementById('modal').addEventListener('click', function(e) {
   if (e.target === this) closeModal();
+});
+document.getElementById('identify-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeIdentifyModal();
 });
 </script>
 </body>
